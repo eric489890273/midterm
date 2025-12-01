@@ -1,4 +1,4 @@
-from flask import Flask, render_template, send_from_directory
+from flask import Flask, send_from_directory
 import os
 
 app = Flask(__name__,
@@ -12,6 +12,9 @@ def index():
 @app.route('/<path:filename>')
 def static_files(filename):
     return send_from_directory('.', filename)
+
+# Vercel 需要這個變數
+application = app
 
 if __name__ == '__main__':
     print("=" * 50)
