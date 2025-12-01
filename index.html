@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>背包亂鬥 - Backpack Battles</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="game-container">
+        <!-- 遊戲標題 -->
+        <header class="game-header">
+            <h1>⚔️ 背包亂鬥 ⚔️</h1>
+            <p class="subtitle">Backpack Battles</p>
+        </header>
+
+        <!-- 主選單 -->
+        <div id="main-menu" class="screen active">
+            <div class="menu-content">
+                <h2>選擇你的職業</h2>
+                <div class="class-selection">
+                    <div class="class-card" data-class="warrior">
+                        <div class="class-icon">⚔️</div>
+                        <h3>戰士</h3>
+                        <p>高生命、高防禦的近戰職業</p>
+                        <ul>
+                            <li>基礎生命: 120</li>
+                            <li>攻擊加成: +15%</li>
+                            <li>防禦加成: +25%</li>
+                            <li>生命加成: +20%</li>
+                        </ul>
+                    </div>
+                    <div class="class-card" data-class="mage">
+                        <div class="class-icon">🔮</div>
+                        <h3>法師</h3>
+                        <p>高攻擊的輸出職業</p>
+                        <ul>
+                            <li>基礎生命: 80</li>
+                            <li>攻擊加成: +40%</li>
+                            <li>防禦加成: -10%</li>
+                            <li>生命加成: 0%</li>
+                        </ul>
+                    </div>
+                    <div class="class-card" data-class="ranger">
+                        <div class="class-icon">🏹</div>
+                        <h3>遊俠</h3>
+                        <p>平衡型職業，各項能力均衡</p>
+                        <ul>
+                            <li>基礎生命: 100</li>
+                            <li>攻擊加成: +20%</li>
+                            <li>防禦加成: +10%</li>
+                            <li>生命加成: +10%</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="game-instructions">
+                    <h3>🎮 遊戲說明</h3>
+                    <p>• 物品有不同形狀，需要巧妙放入背包</p>
+                    <p>• 按 <kbd>R</kbd> 旋轉物品</p>
+                    <p>• 每3回合可擴充背包大小</p>
+                </div>
+                <button id="start-game-btn" class="btn btn-primary" disabled>開始遊戲</button>
+            </div>
+        </div>
+
+        <!-- 準備階段 -->
+        <div id="preparation-phase" class="screen">
+            <div class="phase-header">
+                <div class="player-info">
+                    <span class="player-class"></span>
+                    <span class="player-gold">💰 金幣: <span id="gold-amount">10</span></span>
+                    <span class="player-round">🔄 回合: <span id="round-number">1</span></span>
+                    <span class="backpack-info">🎒 背包: <span id="backpack-size">4x3</span></span>
+                </div>
+                <div class="timer">
+                    準備時間: <span id="prep-timer">45</span>秒
+                </div>
+            </div>
+
+            <div class="preparation-content">
+                <!-- 商店區域 -->
+                <div class="shop-section">
+                    <h2>🏪 商店</h2>
+                    <button id="refresh-shop" class="btn btn-secondary">🔄 刷新 (2💰)</button>
+                    <button id="upgrade-backpack-btn" class="btn btn-upgrade" style="display: none;">📦 擴充背包</button>
+                    <div id="shop-items" class="shop-items">
+                        <!-- 商店物品 -->
+                    </div>
+                </div>
+
+                <!-- 背包區域 -->
+                <div class="backpack-section">
+                    <h2>🎒 我的背包</h2>
+                    <div class="backpack-stats">
+                        <span>⚔️ 攻擊: <span id="total-attack">0</span></span>
+                        <span>🛡️ 防禦: <span id="total-defense">0</span></span>
+                        <span>❤️ 生命: <span id="total-hp">100</span></span>
+                    </div>
+                    <div class="backpack-hint">💡 拖放物品到背包 | 點擊物品移除 | 按 R 旋轉</div>
+                    <div id="backpack-grid" class="backpack-grid">
+                        <!-- 背包格子 -->
+                    </div>
+                </div>
+
+                <!-- 物品欄 -->
+                <div class="inventory-section">
+                    <h2>📦 物品欄</h2>
+                    <div id="inventory-items" class="inventory-items">
+                        <div class="inventory-empty">購買物品後會顯示在這裡<br>拖放到背包中使用</div>
+                    </div>
+                </div>
+            </div>
+
+            <button id="ready-battle-btn" class="btn btn-primary btn-large">⚔️ 準備完成，開始戰鬥！</button>
+        </div>
+
+        <!-- 戰鬥階段 -->
+        <div id="battle-phase" class="screen">
+            <div class="battle-header">
+                <h2>⚔️ 戰鬥中 ⚔️</h2>
+                <div class="round-info">回合 <span id="battle-round">1</span></div>
+            </div>
+
+            <div class="battle-arena">
+                <div class="fighter player-side">
+                    <h3>👤 你</h3>
+                    <div class="health-bar">
+                        <div class="health-fill player-health" style="width: 100%"></div>
+                        <span class="health-text" id="player-hp-text">100/100</span>
+                    </div>
+                    <div class="fighter-backpack" id="player-battle-backpack"></div>
+                    <div class="fighter-stats">
+                        <span>⚔️ <span id="player-battle-atk">0</span></span>
+                        <span>🛡️ <span id="player-battle-def">0</span></span>
+                    </div>
+                </div>
+
+                <div class="vs-sign">VS</div>
+
+                <div class="fighter enemy-side">
+                    <h3>👹 敵人</h3>
+                    <div class="health-bar">
+                        <div class="health-fill enemy-health" style="width: 100%"></div>
+                        <span class="health-text" id="enemy-hp-text">100/100</span>
+                    </div>
+                    <div class="fighter-backpack" id="enemy-battle-backpack"></div>
+                    <div class="fighter-stats">
+                        <span>⚔️ <span id="enemy-battle-atk">0</span></span>
+                        <span>🛡️ <span id="enemy-battle-def">0</span></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="battle-log">
+                <h3>📜 戰鬥日誌</h3>
+                <div id="battle-log-content"></div>
+            </div>
+        </div>
+
+        <!-- 戰鬥結果 -->
+        <div id="battle-result" class="screen">
+            <div class="result-content">
+                <h2 id="result-title">戰鬥結果</h2>
+                <p id="result-message"></p>
+                <div class="reward-info">
+                    <p>獲得金幣: <span id="reward-gold">0</span> 💰</p>
+                </div>
+                <button id="continue-btn" class="btn btn-primary">繼續下一回合</button>
+                <button id="game-over-btn" class="btn btn-secondary" style="display: none;">返回主選單</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 訊息提示 -->
+    <div id="game-message" class="game-message"></div>
+
+    <!-- 物品提示框 -->
+    <div id="item-tooltip" class="tooltip hidden">
+        <h4 id="tooltip-name"></h4>
+        <p id="tooltip-desc"></p>
+        <div id="tooltip-stats"></div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
